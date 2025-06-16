@@ -23,14 +23,19 @@ else
 fi
 
 # Check for test files (using actual extensions .fna and .faa)
-TEST_DIR="$(dirname "$0")"
-if [ -f "$TEST_DIR/test_genome.fna" ]; then
+# Look for files in the test directory (same directory as this script)
+SCRIPT_DIR="$(dirname "$0")"
+echo "DEBUG: Script directory: $SCRIPT_DIR"
+echo "DEBUG: Looking for: $SCRIPT_DIR/test_genome.fna"
+echo "DEBUG: File exists check: $(ls -la "$SCRIPT_DIR/test_genome.fna" 2>/dev/null || echo "NOT FOUND")"
+
+if [ -f "$SCRIPT_DIR/test_genome.fna" ]; then
     echo "✓ Test genome file found: test_genome.fna"
 else
     echo "❌ Test genome file not found: test_genome.fna"
 fi
 
-if [ -f "$TEST_DIR/test_proteins.faa" ]; then
+if [ -f "$SCRIPT_DIR/test_proteins.faa" ]; then
     echo "✓ Test protein file found: test_proteins.faa"
 else
     echo "❌ Test protein file not found: test_proteins.faa"
