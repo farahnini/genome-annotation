@@ -28,9 +28,14 @@ fi
 
 echo "✓ Test files found"
 
-# Run the pipeline with test data (using actual file extensions)
+# First run validation
+echo "Running validation check..."
 cd "$PROJECT_DIR"
+nextflow run validate.nf --genome "test/test_genome.fna"
 
+echo "✓ Validation passed"
+
+# Run the pipeline with test data (using actual file extensions)
 echo "Starting pipeline test..."
 nextflow run main.nf \
     --genome "test/test_genome.fna" \

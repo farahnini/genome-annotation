@@ -1,6 +1,7 @@
 # Genome Annotation Pipeline
 
-**Complete genome annotation in 3 steps: RepeatModeler → RepeatMasker → BRAKER3 → BUSCO**
+**Complete# 2. Run test (~5 min)
+nextflow run main.nf --genome test/test_genome.fna --species "test" -profile singularityenome annotation in 3 steps: RepeatModeler → RepeatMasker → BRAKER3 → BUSCO**
 
 ## 🚀 Quick Start
 
@@ -40,8 +41,20 @@ results/
 chmod +x setup_test.sh
 ./setup_test.sh --small-test
 
-# 2. Run test (~5 min)
-nextflow run main.nf --genome test/test_genome.fasta --species "test" -profile singularity
+# 2. Validate setup
+./test/validate_setup.sh
+
+# 3. Run validation check
+nextflow run validate.nf --genome test/test_genome.fna
+
+# 4. Run full test (~5 min)
+nextflow run main.nf --genome test/test_genome.fna --species "test" -profile singularity
+```
+
+Or use the automated test script:
+```bash
+# All-in-one test script
+./test/run_test.sh
 ```
 
 The setup script will either download a small Lambda phage genome (~48kb) or create a minimal synthetic genome if download fails.

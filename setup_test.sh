@@ -58,12 +58,12 @@ if [ "$SKIP_DOWNLOAD" = false ]; then
         echo "Downloading Lambda phage genome (~48kb) for quick testing..."
         if wget -O "$LAMBDA_FILE" "$LAMBDA_URL" 2>/dev/null; then
             gunzip "$LAMBDA_FILE"
-            mv "$OUTPUT_DIR/GCF_000840245.1_ViralProj14204_genomic.fna" "$OUTPUT_DIR/test_genome.fasta"
+            mv "$OUTPUT_DIR/GCF_000840245.1_ViralProj14204_genomic.fna" "$OUTPUT_DIR/test_genome.fna"
             echo "✓ Small test genome downloaded (Lambda phage)"
         else
             echo "❌ Failed to download Lambda phage genome, creating minimal test FASTA..."
             # Create a minimal test FASTA if download fails
-            cat > "$OUTPUT_DIR/test_genome.fasta" << 'FASTA_EOF'
+            cat > "$OUTPUT_DIR/test_genome.fna" << 'FASTA_EOF'
 >test_sequence_1
 ATGCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATC
 GATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATC
@@ -81,7 +81,7 @@ FASTA_EOF
         fi
         
         # Create a small protein file for testing
-        cat > "$OUTPUT_DIR/test_proteins.fasta" << 'PROTEIN_EOF'
+        cat > "$OUTPUT_DIR/test_proteins.faa" << 'PROTEIN_EOF'
 >test_protein_1
 MKAIFVLKGASDERIVPIGFAIAERVTGKHNLLQSLKDTPAVLSKVLATVCVDWVSKG
 APAVSAILEMKGRTLAAEYGLLAPTTLGKGGQTSPNKVAFGQIAKVEGYDIDVGNHRV
@@ -103,7 +103,7 @@ PROTEIN_EOF
         if wget -O "$GENOME_FILE" "$GENOME_URL"; then
             # Extract the file
             gunzip "$GENOME_FILE"
-            mv "$OUTPUT_DIR/GCF_000005825.2_ASM582v2_genomic.fna" "$OUTPUT_DIR/test_genome.fasta"
+            mv "$OUTPUT_DIR/GCF_000005825.2_ASM582v2_genomic.fna" "$OUTPUT_DIR/test_genome.fna"
             echo "✓ Test genome downloaded and extracted"
         else
             echo "❌ Failed to download test genome"
@@ -118,7 +118,7 @@ PROTEIN_EOF
         if wget -O "$PROTEIN_FILE" "$PROTEIN_URL"; then
             # Extract the file
             gunzip "$PROTEIN_FILE"
-            mv "$OUTPUT_DIR/GCF_000005825.2_ASM582v2_protein.faa" "$OUTPUT_DIR/test_proteins.fasta"
+            mv "$OUTPUT_DIR/GCF_000005825.2_ASM582v2_protein.faa" "$OUTPUT_DIR/test_proteins.faa"
             echo "✓ Test proteins downloaded and extracted"
         else
             echo "❌ Failed to download test proteins"

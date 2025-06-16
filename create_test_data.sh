@@ -113,9 +113,9 @@ echo "Creating test genome with $NUM_CONTIGS contigs..."
         echo ">synthetic_contig_${i} length=${CONTIG_LENGTH}"
         generate_dna_sequence $CONTIG_LENGTH
     done
-} > "$OUTPUT_DIR/test_genome.fasta"
+} > "$OUTPUT_DIR/test_genome.fna"
 
-echo "✓ Test genome created: $OUTPUT_DIR/test_genome.fasta"
+echo "✓ Test genome created: $OUTPUT_DIR/test_genome.fna"
 
 # Generate test proteins
 echo "Creating test proteins with $NUM_PROTEINS sequences..."
@@ -124,9 +124,9 @@ echo "Creating test proteins with $NUM_PROTEINS sequences..."
         echo ">synthetic_protein_${i} length=${PROTEIN_LENGTH}"
         generate_protein_sequence $PROTEIN_LENGTH
     done
-} > "$OUTPUT_DIR/test_proteins.fasta"
+} > "$OUTPUT_DIR/test_proteins.faa"
 
-echo "✓ Test proteins created: $OUTPUT_DIR/test_proteins.fasta"
+echo "✓ Test proteins created: $OUTPUT_DIR/test_proteins.faa"
 
 # Create a synthetic RNA-seq file (small FASTQ for testing)
 echo "Creating small synthetic RNA-seq file..."
@@ -149,8 +149,8 @@ echo "✓ Test RNA-seq file created: $OUTPUT_DIR/test_rnaseq.fastq"
 # Show file information
 echo ""
 echo "Generated test files:"
-echo "  Genome: $(du -h "$OUTPUT_DIR/test_genome.fasta" | cut -f1) ($(grep -c '^>' "$OUTPUT_DIR/test_genome.fasta") sequences)"
-echo "  Proteins: $(du -h "$OUTPUT_DIR/test_proteins.fasta" | cut -f1) ($(grep -c '^>' "$OUTPUT_DIR/test_proteins.fasta") sequences)"
+echo "  Genome: $(du -h "$OUTPUT_DIR/test_genome.fna" | cut -f1) ($(grep -c '^>' "$OUTPUT_DIR/test_genome.fna") sequences)"
+echo "  Proteins: $(du -h "$OUTPUT_DIR/test_proteins.faa" | cut -f1) ($(grep -c '^>' "$OUTPUT_DIR/test_proteins.faa") sequences)"
 echo "  RNA-seq: $(du -h "$OUTPUT_DIR/test_rnaseq.fastq" | cut -f1) ($(grep -c '^@' "$OUTPUT_DIR/test_rnaseq.fastq") reads)"
 
 # Create appropriate config based on size
@@ -173,8 +173,8 @@ fi
 cat > "$OUTPUT_DIR/$CONFIG_FILE" << EOF
 // Configuration for synthetic test data ($GENOME_SIZE size)
 params {
-    genome = "test/test_genome.fasta"
-    proteins = "test/test_proteins.fasta"
+    genome = "test/test_genome.fna"
+    proteins = "test/test_proteins.faa"
     rna_seq = "test/test_rnaseq.fastq"
     species = "synthetic_test_species"
     outdir = "synthetic_test_results"
@@ -222,8 +222,8 @@ cat > "$OUTPUT_DIR/run_synthetic_test.sh" << 'EOF'
 #!/bin/bash
 # Test run for synthetic genome annotation pipeline data
 
-GENOME_FILE="test/test_genome.fasta"
-PROTEIN_FILE="test/test_proteins.fasta"
+GENOME_FILE="test/test_genome.fna"
+PROTEIN_FILE="test/test_proteins.faa"
 RNA_SEQ_FILE="test/test_rnaseq.fastq"
 SPECIES_NAME="synthetic_test_species"
 OUTPUT_DIR="synthetic_test_results"
@@ -252,7 +252,7 @@ echo ""
 echo "Synthetic test data creation complete!"
 echo ""
 echo "Quick test command:"
-echo "  nextflow run main.nf --genome test/test_genome.fasta --species synthetic_test_species -c test/$CONFIG_FILE -profile singularity"
+echo "  nextflow run main.nf --genome test/test_genome.fna --species synthetic_test_species -c test/$CONFIG_FILE -profile singularity"
 echo ""
 echo "Or run the complete test:"
 echo "  ./test/run_synthetic_test.sh"
