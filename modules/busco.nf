@@ -115,13 +115,11 @@ process BUSCO {
         echo "Summary file found: \$summary_file" >> busco.log
         echo "" >> busco.log
         echo "BUSCO Summary:" >> busco.log
-        cat "\$summary_file" >> busco.log
-        
-        # Extract key statistics
+        cat "\$summary_file" >> busco.log        # Extract key statistics
         if grep -q "Complete BUSCOs" "\$summary_file"; then
-            complete=\$(grep "Complete BUSCOs" "\$summary_file" | sed 's/.*(\([0-9.]*\)%).*/\1/')
-            fragmented=\$(grep "Fragmented BUSCOs" "\$summary_file" | sed 's/.*(\([0-9.]*\)%).*/\1/')
-            missing=\$(grep "Missing BUSCOs" "\$summary_file" | sed 's/.*(\([0-9.]*\)%).*/\1/')
+            complete=\$(grep "Complete BUSCOs" "\$summary_file" | awk -F'[()]' '{print \$2}' | sed 's/%//')
+            fragmented=\$(grep "Fragmented BUSCOs" "\$summary_file" | awk -F'[()]' '{print \$2}' | sed 's/%//')
+            missing=\$(grep "Missing BUSCOs" "\$summary_file" | awk -F'[()]' '{print \$2}' | sed 's/%//')
             
             echo "" >> busco.log
             echo "Key Statistics:" >> busco.log
