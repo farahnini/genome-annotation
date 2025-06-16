@@ -33,11 +33,18 @@ results/
 
 ## 🧪 Test First
 
+**Important: Run setup first to download test data!**
+
 ```bash
-# Test with small data (~5 min)
+# 1. Setup test data (downloads small test genome)
+chmod +x setup_test.sh
 ./setup_test.sh --small-test
+
+# 2. Run test (~5 min)
 nextflow run main.nf --genome test/test_genome.fasta --species "test" -profile singularity
 ```
+
+The setup script will either download a small Lambda phage genome (~48kb) or create a minimal synthetic genome if download fails.
 
 ## ⚙️ Common Options
 
