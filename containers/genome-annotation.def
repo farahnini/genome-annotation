@@ -1,0 +1,59 @@
+# Custom Singularity definition file for genome annotation tools
+# Build with: singularity build genome-annotation.sif genome-annotation.def
+
+Bootstrap: docker
+From: ubuntu:20.04
+
+%labels
+    Author Your Name
+    Version 1.0
+    Description Genome annotation tools container
+
+%environment
+    export PATH="/opt/RepeatMasker:/opt/RepeatModeler:/opt/Augustus/bin:/opt/Augustus/scripts:$PATH"
+    export AUGUSTUS_CONFIG_PATH="/opt/Augustus/config"
+    export AUGUSTUS_SCRIPTS_PATH="/opt/Augustus/scripts"
+
+%post
+    # Update system and install dependencies
+    apt-get update && apt-get install -y \
+        wget \
+        curl \
+        build-essential \
+        perl \
+        python3 \
+        python3-pip \
+        git \
+        unzip \
+        libdbd-mysql-perl \
+        libtext-soundex-perl \
+        libjson-perl \
+        liburi-perl \
+        libwww-perl \
+        libfile-which-perl \
+        && rm -rf /var/lib/apt/lists/*
+
+    # Install seqkit
+    wget https://github.com/shenwei356/seqkit/releases/download/v2.3.1/seqkit_linux_amd64.tar.gz
+    tar -xzf seqkit_linux_amd64.tar.gz
+    mv seqkit /usr/local/bin/
+    rm seqkit_linux_amd64.tar.gz
+
+    # Create installation directory
+    mkdir -p /opt
+
+%runscript
+    exec "$@"
+
+%help
+    This container includes tools for genome annotation:
+    - seqkit for sequence manipulation
+    - RepeatModeler for de novo repeat identification
+    - RepeatMasker for repeat masking
+    - BRAKER3 dependencies
+
+    Note: This is a basic template. For production use, consider using 
+    the official containers mentioned in the pipeline:
+    - dfam/tetools:1.88.5 for RepeatModeler/RepeatMasker
+    - teambraker/braker3:latest for BRAKER3
+    - biocontainers/seqkit:v2.3.1_cv1 for seqkit
