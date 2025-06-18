@@ -26,7 +26,14 @@ if [ ! -f "$SCRIPT_DIR/test_proteins.faa" ]; then
     exit 1
 fi
 
-echo "✓ Test files found"
+# Check if config file exists
+if [ ! -f "$SCRIPT_DIR/test_data.config" ]; then
+    echo "❌ Test config file not found: $SCRIPT_DIR/test_data.config"
+    echo "Please run setup_test.sh first to create test configuration"
+    exit 1
+fi
+
+echo "✓ Test files and configuration found"
 
 # First run validation
 echo "Running validation check..."
