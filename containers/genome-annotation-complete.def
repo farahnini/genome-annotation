@@ -1,0 +1,172 @@
+Bootstrap: docker
+From: ubuntu:22.04
+
+%labels
+    Author farahnini
+    Version 1.0
+    Description Genome Annotation Pipeline Environment with Java 17 and Nextflow
+
+%help
+    This container provides a complete environment for the genome annotation pipeline
+    including Java 17, Nextflow, and all required bioinformatics tools.
+    
+    Usage:
+    singularity run genome-annotation.sif nextflow run main.nf --genome genome.fasta --species "species" -profile singularity
+
+%environment
+    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+    export PATH=/usr/lib/jvm/java-17-openjdk-amd64/bin:/opt/nextflow:$PATH
+    export NEXTFLOW_HOME=/opt/nextflow
+    export LC_ALL=C
+
+%post
+    # Update system
+    apt-get update && apt-get install -y \
+        openjdk-17-jdk \
+        wget \
+        curl \
+        git \
+        unzip \
+        build-essential \
+        python3 \
+        python3-pip \
+        perl \
+        libssl-dev \
+        zlib1g-dev \
+        libbz2-dev \
+        liblzma-dev \
+        && apt-get clean
+
+    # Set Java 17 as default
+    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+    export PATH=$JAVA_HOME/bin:$PATH
+
+    # Install Nextflow
+    mkdir -p /opt/nextflow
+    cd /opt/nextflow
+    curl -s https://get.nextflow.io | bash
+    chmod +x nextflow
+
+    # Test Nextflow installation
+    /opt/nextflow/nextflow -version
+
+    # Install bioinformatics tools
+    apt-get update && apt-get install -y \
+        augustus \
+        augustus-data \
+        augustus-doc \
+        bamtools \
+        bcftools \
+        bedtools \
+        blast2 \
+        bowtie2 \
+        bwa \
+        cufflinks \
+        emboss \
+        exonerate \
+        fastqc \
+        gff2bed \
+        gffread \
+        hisat2 \
+        hmmer \
+        jellyfish \
+        mafft \
+        muscle \
+        ncbi-blast+ \
+        prodigal \
+        repeatmasker \
+        samtools \
+        seqtk \
+        snap \
+        stringtie \
+        tophat \
+        trimmomatic \
+        trinity \
+        && apt-get clean
+
+    # Install RepeatModeler and dependencies
+    cd /tmp
+    wget http://www.repeatmasker.org/RepeatModeler/RepeatModeler-2.0.4.tar.gz
+    tar -xzf RepeatModeler-2.0.4.tar.gz
+    cd RepeatModeler-2.0.4
+    perl ./configure
+    cp -r * /usr/local/bin/
+
+    # Install BRAKER3 dependencies
+    apt-get update && apt-get install -y \
+        cpanminus \
+        libfile-which-perl \
+        libparallel-forkmanager-perl \
+        libyaml-perl \
+        libhash-merge-perl \
+        liblist-util-perl \
+        libscalar-util-numeric-perl \
+        libclass-data-inheritable-perl \
+        libexception-class-perl \
+        libtest-pod-perl \
+        && apt-get clean
+
+    # Install additional Perl modules
+    cpanm File::Spec::Functions
+    cpanm Hash::Merge
+    cpanm List::Util
+    cpanm Logger::Simple
+    cpanm Parallel::ForkManager
+    cpanm POSIX
+    cpanm Scalar::Util::Numeric
+    cpanm YAML
+
+    # Install BUSCO
+    pip3 install busco
+
+    # Install SeqKit for FASTA manipulation
+    cd /tmp
+    wget https://github.com/shenwei356/seqkit/releases/download/v2.3.1/seqkit_linux_amd64.tar.gz
+    tar -xzf seqkit_linux_amd64.tar.gz
+    mv seqkit /usr/local/bin/
+
+    # Create symbolic links for common tools
+    ln -sf /usr/bin/augustus /usr/local/bin/augustus
+    ln -sf /usr/bin/samtools /usr/local/bin/samtools
+    ln -sf /usr/bin/makeblastdb /usr/local/bin/makeblastdb
+    ln -sf /usr/bin/blastn /usr/local/bin/blastn
+    ln -sf /usr/bin/tblastn /usr/local/bin/tblastn
+
+    # Set permissions
+    chmod -R 755 /usr/local/bin
+    chmod -R 755 /opt/nextflow
+
+    # Clean up
+    apt-get autoremove -y
+    apt-get autoclean
+    rm -rf /var/lib/apt/lists/*
+    rm -rf /tmp/*
+
+%runscript
+    echo "Genome Annotation Pipeline Container"
+    echo "Java: $(java -version 2>&1 | head -n1)"
+    echo "Nextflow: $(/opt/nextflow/nextflow -version 2>&1 | head -n1)"
+    echo ""
+    
+    if [ $# -eq 0 ]; then
+        echo "Usage: singularity run genome-annotation.sif nextflow run main.nf [options]"
+        echo ""
+        echo "Example:"
+        echo "singularity run genome-annotation.sif nextflow run main.nf --genome genome.fasta --species 'E_coli' -profile singularity"
+    else
+        exec "$@"
+    fi
+
+%test
+    # Test Java
+    java -version
+    
+    # Test Nextflow
+    /opt/nextflow/nextflow -version
+    
+    # Test key bioinformatics tools
+    augustus --version
+    busco --version
+    seqkit version
+    samtools --version
+    makeblastdb -version
