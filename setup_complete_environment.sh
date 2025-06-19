@@ -105,10 +105,26 @@ if [ -z "$JAVA_17_PATH" ]; then
 fi
 
 if [ -n "$JAVA_17_PATH" ] && [ -d "$JAVA_17_PATH" ]; then
+    # Remove existing symlink if it exists
+    rm -f "$JAVA_DIR/current"
+    # Create symlink to the Java 17 directory
     ln -sf "$JAVA_17_PATH" "$JAVA_DIR/current"
     echo "✓ Java 17 configured: $JAVA_17_PATH"
+    
+    # Verify the symlink works
+    if [ -x "$JAVA_DIR/current/bin/java" ]; then
+        echo "✓ Java 17 symlink verified"
+    else
+        echo "❌ Java 17 symlink verification failed"
+        echo "Debug: JAVA_17_PATH=$JAVA_17_PATH"
+        echo "Debug: JAVA_DIR=$JAVA_DIR"
+        ls -la "$JAVA_DIR/"
+        exit 1
+    fi
 else
     echo "❌ Could not find Java 17 installation"
+    echo "Available Java installations:"
+    find /usr/lib/jvm -name "java-*-openjdk*" -type d || echo "None found"
     exit 1
 fi
 

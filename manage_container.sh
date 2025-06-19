@@ -6,7 +6,15 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+PROJECT_DIR="$SCRIPT_DIR"
+
+# Verify we're in the right directory by checking for main.nf
+if [ ! -f "$PROJECT_DIR/main.nf" ]; then
+    echo "❌ main.nf not found in $PROJECT_DIR"
+    echo "Please run this script from the genome-annotation directory"
+    exit 1
+fi
+
 CONTAINER_DIR="$PROJECT_DIR/containers"
 CONTAINER_DEF="$CONTAINER_DIR/genome-annotation-complete.def"
 CONTAINER_SIF="$CONTAINER_DIR/genome-annotation-complete.sif"

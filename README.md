@@ -1,121 +1,102 @@
 # Genome Annotation Pipeline
 
-**Complete genome annotation in 3 steps: RepeatModeler → RepeatMasker → BRAKER3 → BUSCO**
+**Complete genome annotation pipeline: RepeatModeler → RepeatMasker → BRAKER3 → BUSCO**
 
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20WSL2-blue)](https://docs.microsoft.com/en-us/windows/wsl/)
-[![Java](https://img.shields.io/badge/Java-11%20%7C%2017-orange)](https://openjdk.java.net/)
+[![Java](https://img.shields.io/badge/Java-11%20%7C%2017%20%7C%2021-orange)](https://openjdk.java.net/)
 [![Nextflow](https://img.shields.io/badge/Nextflow-22.04+-brightgreen)](https://www.nextflow.io/)
 [![Singularity](https://img.shields.io/badge/Singularity-3.8+-red)](https://sylabs.io/)
 
-## 🎯 Three Setup Methods
+## 🚀 Quick Start
 
-Choose the method that works best for your system:
+**Choose your platform:**
 
-### Method 1: 🐳 Complete Environment (Recommended for Java issues)
-**Perfect for Java compatibility problems or clean environments**
+### 🐧 Linux/WSL2 Users (Recommended)
 
 ```bash
-# 1. Get pipeline
+# 1. Get the pipeline
 git clone https://github.com/farahnini/genome-annotation.git
 cd genome-annotation
 
-# 2. One-command setup (handles all dependencies)
-chmod +x setup_complete_environment.sh
-./setup_complete_environment.sh
+# 2. Simple setup (works with any Java version)
+chmod +x setup_simple.sh
+./setup_simple.sh
 
-# 3. Test everything works
-./manage_container.sh test
+# 3. Test it works
+source activate_environment.sh
+./test/run_test.sh
 
 # 4. Run with your data
-./manage_container.sh run --genome your_genome.fasta --species "your_species"
+nextflow run main.nf --genome your_genome.fasta --species "your_species" -profile singularity
 ```
 
-### Method 2: 🔧 Manual Installation
-**For users who want control over their environment**
+### 🪟 Windows Users
 
-```bash
-# 1. Install prerequisites
-curl -s https://get.nextflow.io | bash && sudo mv nextflow /usr/local/bin/
-sudo apt install -y singularity-ce openjdk-17-jdk
-
-# 2. Get pipeline and check installation
-git clone https://github.com/farahnini/genome-annotation.git
-cd genome-annotation
-chmod +x check_installation.sh
-./check_installation.sh
-
-# 3. Setup test data and validate
-./setup_test.sh --small-test
-./test/run_test.sh
-```
-
-### Method 3: 🌟 Environment Manager
-**Automatically detects and fixes environment issues**
-
-```bash
-# 1. Get pipeline
+```powershell
+# 1. Get the pipeline
 git clone https://github.com/farahnini/genome-annotation.git
 cd genome-annotation
 
-# 2. Auto-setup environment
-chmod +x setup_environment.sh
-./setup_environment.sh
+# 2. Setup (PowerShell)
+.\setup_test.ps1
 
-# 3. Test and run
+# 3. Run pipeline (in WSL2)
+wsl
+source activate_environment.sh
 ./test/run_test.sh
 ```
 
-## 🧪 Testing Your Setup
+**⚠️ Windows Note**: The pipeline runs in Linux containers. Windows users need WSL2 for the actual pipeline execution.
 
-**⚠️ ALWAYS test first before running on real data!**
+## 🧪 Testing & Validation
 
-### Quick Test (5 minutes)
+**Always test before using real data!**
+
 ```bash
-# Option 1: Using container manager
-./manage_container.sh run --genome test/test_genome.fna --species "test_virus" -c test/ultra_minimal.config
-
-# Option 2: Direct test
-./test/run_test.sh
-
-# Option 3: Manual test
-nextflow run main.nf --genome test/test_genome.fna --species "test_virus" -profile singularity
-```
-
-### Troubleshooting Tests
-```bash
-# Check your installation
+# Quick system check
 ./check_installation.sh
 
-# Create test data if missing
-./setup_test.sh --small-test
+# Activate environment
+source activate_environment.sh
 
-# Validate setup
-./test/validate_setup.sh
+# Run test pipeline (~5 minutes)
+./test/run_test.sh
 
-# Test individual components
+# Or test individual components
 nextflow run validate.nf --genome test/test_genome.fna
 ```
 
-## 🔧 Running Your Data
+## 💻 Usage Examples
 
 ### Basic Usage
 ```bash
-# Method 1: Using container (recommended)
-./manage_container.sh run --genome your_genome.fasta --species "your_species"
+# Activate environment (if not already active)
+source activate_environment.sh
 
-# Method 2: Direct command
-nextflow run main.nf --genome your_genome.fasta --species "your_species" -profile singularity
+# Basic annotation (genome only)
+nextflow run main.nf \
+  --genome your_genome.fasta \
+  --species "Escherichia_coli" \
+  -profile singularity
 
-# Method 3: With protein evidence (better results)
-nextflow run main.nf --genome genome.fa --proteins proteins.fa --species "E_coli" -profile singularity
+# With protein evidence (recommended)
+nextflow run main.nf \
+  --genome your_genome.fasta \
+  --proteins protein_evidence.fasta \
+  --species "Escherichia_coli" \
+  -profile singularity
+
+# Custom output directory
+nextflow run main.nf \
+  --genome your_genome.fasta \
+  --species "Escherichia_coli" \
+  --outdir my_results \
+  -profile singularity
 ```
 
 ### Advanced Options
 ```bash
-# Custom output directory
-nextflow run main.nf --genome genome.fa --species "E_coli" --outdir my_results -profile singularity
-
-# Resume failed runs
+# Resume interrupted run
 nextflow run main.nf --genome genome.fa --species "E_coli" -profile singularity -resume
 
 # Use specific BUSCO database
@@ -123,6 +104,9 @@ nextflow run main.nf --genome genome.fa --species "E_coli" --busco_db bacteria_o
 
 # Resource-constrained systems
 nextflow run main.nf --genome genome.fa --species "E_coli" -profile singularity -c test/minimal.config
+
+# Use container manager (alternative approach)
+./manage_container.sh run --genome genome.fa --species "E_coli"
 ```
 
 ## 📁 Results
@@ -187,92 +171,57 @@ nextflow run main.nf --genome genome.fa --proteins proteins.fa --species "E_coli
 nextflow run main.nf --genome genome.fa --species "E_coli" --outdir my_results -profile singularity
 ```
 
-## ❓ Troubleshooting Common Issues
+## ❓ Troubleshooting
 
-| Problem | Solution | Script |
-|---------|----------|---------|
-| **Java compatibility (Java 18+)** | Use complete environment setup | `./setup_complete_environment.sh` |
-| **"nextflow: command not found"** | Install with environment manager | `./setup_environment.sh` |
-| **"singularity: command not found"** | Install Singularity/Apptainer | `sudo apt install -y singularity-ce` |
-| **Test data missing** | Run setup script | `./setup_test.sh --small-test` |
-| **Container issues** | Use container manager | `./manage_container.sh build` |
-| **Memory errors** | Use minimal config | `-c test/minimal.config` |
-| **Windows users** | Install WSL2 | `wsl --install Ubuntu-22.04` |
-| **Pipeline stuck** | Check detailed logs | `tail -f .nextflow.log` |
-| **Permission errors** | Make scripts executable | `chmod +x *.sh test/*.sh` |
+| Problem | Quick Fix | Detailed Solution |
+|---------|-----------|------------------|
+| **Java compatibility issues** | `source activate_environment.sh` | Use `setup_simple.sh` |
+| **"command not found" errors** | Run `./check_installation.sh` | Install missing tools |
+| **Test data missing** | `./setup_test.sh --small-test` | Downloads/creates test files |
+| **Container issues** | `./manage_container.sh build` | Rebuilds containers |
+| **Memory errors** | Use `-c test/minimal.config` | Reduces resource requirements |
+| **Windows compatibility** | Use WSL2 for execution | Install `wsl --install Ubuntu-22.04` |
+| **Pipeline freezes** | Check `tail -f .nextflow.log` | Shows detailed error logs |
 
-### 🆘 Detailed Troubleshooting
-
+### Quick Fixes
 ```bash
-# Complete system check
-./check_installation.sh
-
-# Fix Java issues automatically
-./setup_complete_environment.sh
-
-# Interactive container shell for debugging
-./manage_container.sh shell
-
-# Clean up and start fresh
-./manage_container.sh clean
-singularity cache clean --force
+# Fix most common issues
+./fix_environment.sh           # Clean and restart setup
+source activate_environment.sh # Fix Java compatibility  
+./check_installation.sh        # Diagnose problems
 ```
 
-**For detailed troubleshooting guides, see [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md)**
+**For comprehensive troubleshooting, see [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md)**
 
-## 🛠️ Advanced Environment Management
+## 🗂️ Available Scripts (Why so many?)
 
-### Container Management
-```bash
-# Build complete environment container (includes all tools)
-./manage_container.sh build
+The pipeline includes multiple setup scripts for different use cases:
 
-# Test container functionality
-./manage_container.sh test
+### 🎯 **Main Scripts** (Use these)
+- **`setup_simple.sh`** ⭐ - **Recommended**: Works with any Java version, fixes compatibility automatically
+- **`test/run_test.sh`** - Tests the pipeline with small data (~5 min)
+- **`check_installation.sh`** - Diagnoses installation issues
 
-# Run pipeline with container
-./manage_container.sh run --genome genome.fa --species "E_coli"
+### 🔧 **Alternative Setup Methods**
+- **`setup_complete_environment.sh`** - Creates isolated environment (for complex setups)
+- **`setup_environment.sh`** - Basic environment setup
+- **`manage_container.sh`** - Container-based approach (advanced users)
 
-# Interactive debugging shell
-./manage_container.sh shell
+### 🪟 **Windows-Specific**
+- **`setup_test.ps1`** - PowerShell setup for Windows users
+- **`run_pipeline.ps1`** - PowerShell wrapper for Windows
 
-# Container information
-./manage_container.sh info
+### 🛠️ **Utility Scripts**
+- **`fix_environment.sh`** - Cleans up failed installations
+- **`quick_start.sh`** - Shows all available options
+- **`create_test_data.sh`** - Alternative test data creation
 
-# Clean up containers
-./manage_container.sh clean
-```
-
-### Environment Profiles
-```bash
-# Standard profile (uses system tools)
-nextflow run main.nf --genome genome.fa -profile standard
-
-# Singularity profile (recommended)
-nextflow run main.nf --genome genome.fa -profile singularity
-
-# Docker profile
-nextflow run main.nf --genome genome.fa -profile docker
-
-# Cluster profile (SLURM)
-nextflow run main.nf --genome genome.fa -profile cluster
-
-# Laptop profile (resource-constrained)
-nextflow run main.nf --genome genome.fa -profile laptop
-```
-
-### Java Version Management
-The pipeline automatically handles Java version compatibility:
-
-- **Java 8**: ⚠️ May work, but not recommended
-- **Java 11**: ✅ Fully supported and recommended
-- **Java 17**: ✅ Fully supported and recommended  
-- **Java 18+**: ❌ Not compatible with Nextflow
-
-If you have Java compatibility issues, use the complete environment setup:
-```bash
-./setup_complete_environment.sh
-```
+**Why so many?** Different users have different needs:
+- **Beginners**: Use `setup_simple.sh` 
+- **Java issues**: Use `setup_complete_environment.sh`
+- **Windows users**: Use PowerShell scripts + WSL2
+- **Advanced users**: Use container approach
+- **Troubleshooting**: Multiple diagnostic and fix scripts
 
 ## 📁 Output Files
 
@@ -348,66 +297,55 @@ graph TD
 - **Docker**: 20.10+ (alternative to Singularity)
 - **Internet**: Required for initial container download (~2-5 GB)
 
-## 🏗️ Project Structure
+## 🏗️ Key Files & Directories
 
 ```
 genome-annotation/
-├── 📋 README.md                  # This file
-├── 📋 TROUBLESHOOTING.md         # Detailed troubleshooting guide
 ├── 🔧 main.nf                    # Main pipeline workflow
-├── ⚙️  nextflow.config           # Pipeline configuration
-├── 🧪 validate.nf               # Validation workflow
-├── 📜 setup_complete_environment.sh  # Complete environment setup
-├── 📜 setup_environment.sh       # Basic environment setup  
-├── 📜 manage_container.sh        # Container management
-├── 📜 check_installation.sh      # Installation verification
-├── 📜 setup_test.sh              # Test data setup
-├── 📁 conf/                      # Configuration files
-│   └── environments.config
+├── ⚙️  nextflow.config           # Pipeline configuration  
+├── 📜 setup_simple.sh           # ⭐ Recommended setup script
+├── 📜 activate_environment.sh    # Environment activation (created by setup)
+├── 🧪 test/                      # Test data and configurations
+│   ├── run_test.sh              # Test runner
+│   ├── validate_setup.sh        # Setup validator
+│   └── *.config                 # Resource configurations
+├── 📁 modules/                   # Pipeline process modules
 ├── 📁 containers/                # Container definitions
-│   ├── genome-annotation.def
-│   └── genome-annotation-complete.def
-├── 📁 modules/                   # Process modules
-│   ├── clean_headers.nf
-│   ├── repeatmodeler.nf
-│   ├── repeatmasker.nf
-│   ├── braker3.nf
-│   └── busco.nf
-├── 📁 test/                      # Test data and configs
-│   ├── run_test.sh
-│   ├── validate_setup.sh
-│   ├── test_data.config
-│   ├── minimal.config
-│   └── ultra_minimal.config
-└── 📁 scripts/                   # Utility scripts
-    └── generate_summary.ps1
+└── 📋 README.md                  # This file
 ```
 
-## 🤝 Contributing & Support
+**After setup, your results will be in:**
+```
+results/
+├── 📄 augustus.hints.gtf         # ← Main gene annotations
+├── 🧬 augustus.hints.aa          # ← Predicted proteins  
+├── 📊 busco_summary.txt          # ← Quality report
+└── 🎭 genome.masked              # ← Repeat-masked genome
+```
+
+## 🤝 Support & Contributing
 
 ### Getting Help
-1. **Check existing issues**: Browse [GitHub Issues](https://github.com/farahnini/genome-annotation/issues)
-2. **Run diagnostics**: Use `./check_installation.sh` for system checks
-3. **Review logs**: Check `.nextflow.log` for detailed error information
-4. **Try container approach**: Use `./setup_complete_environment.sh` for clean environment
+1. **Quick diagnosis**: Run `./check_installation.sh`
+2. **Check logs**: View `.nextflow.log` for detailed errors  
+3. **Review issues**: Browse [GitHub Issues](https://github.com/farahnini/genome-annotation/issues)
+4. **Try clean setup**: Use `./fix_environment.sh` then `./setup_simple.sh`
 
-### Reporting Issues
-When reporting problems, please include:
-- Output from `./check_installation.sh`
-- Your system info: `uname -a` and available resources
-- Nextflow version: `nextflow -version`
-- Error messages from `.nextflow.log`
-- Command that failed
+### System Requirements
+- **OS**: Linux or WSL2 (Windows 10/11)
+- **RAM**: 8+ GB (16+ GB recommended)
+- **CPU**: 4+ cores (8+ cores recommended)
+- **Storage**: 50+ GB free space
+- **Java**: Any version (auto-managed by setup scripts)
+- **Internet**: Required for container downloads
 
-### License
-This pipeline is released under the MIT License. See [LICENSE](LICENSE) for details.
-
-### Citation
-If you use this pipeline in your research, please cite:
-```
-[Pipeline Citation - To be updated]
-```
+### Performance Guidelines
+- **Small genomes** (<100 Mb): 2-8 hours, 8 GB RAM
+- **Typical genomes** (100 Mb - 1 Gb): 1-3 days, 16+ GB RAM  
+- **Large genomes** (>1 Gb): 3-7 days, 64+ GB RAM
 
 ---
 
-**Happy annotating! 🧬🔬**
+**Questions? Issues? Check [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md) or open a GitHub issue!**
+
+**Happy genome annotating! 🧬🔬**
