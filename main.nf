@@ -51,16 +51,15 @@ Output dir   : ${params.outdir}
 workflow {
     // Input channels
     genome_ch = Channel.fromPath(params.genome, checkIfExists: true)
-    
-    // Optional protein channel
+      // Optional protein channel
     proteins_ch = params.proteins ? 
         Channel.fromPath(params.proteins, checkIfExists: true) : 
-        Channel.fromPath('NO_FILE')
+        Channel.value('NO_FILE')
     
     // Optional RNA-seq channel  
     rna_seq_ch = params.rna_seq ? 
         Channel.fromPath(params.rna_seq, checkIfExists: true) : 
-        Channel.fromPath('NO_FILE')
+        Channel.value('NO_FILE')
     
     // Step 1: Clean sequence headers
     CLEAN_HEADERS(genome_ch)

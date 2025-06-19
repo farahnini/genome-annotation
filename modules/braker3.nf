@@ -1,12 +1,8 @@
 process BRAKER3 {
-    tag "$genome.simpleName"
+    tag "$masked_genome.simpleName"
     publishDir "${params.outdir}/04_braker3", mode: 'copy'
     
     container 'docker://teambraker/braker3:latest'
-    
-    cpus 16
-    memory '64 GB'
-    time '72h'
     
     input:
     path masked_genome
@@ -20,10 +16,9 @@ process BRAKER3 {
     path "braker_output/augustus.hints.aa", emit: protein_sequences, optional: true
     path "braker_output/augustus.hints.codingseq", emit: coding_sequences, optional: true
     path "braker_output/braker.log", emit: log_file
-    
-    script:
-    def protein_arg = proteins.name != 'NO_FILE' && proteins.size() > 0 ? "--prot_seq=${proteins}" : ""
-    def rnaseq_arg = rna_seq.name != 'NO_FILE' && rna_seq.size() > 0 ? "--rnaseq_sets_ids=${rna_seq}" : ""
+      script:
+    def protein_arg = proteins != 'NO_FILE' ? "--prot_seq=${proteins}" : ""
+    def rnaseq_arg = rna_seq != 'NO_FILE' ? "--rnaseq_sets_ids=${rna_seq}" : ""
     def species_name = params.species.replaceAll(/[^a-zA-Z0-9_]/, "_")
     """
     #!/bin/bash
@@ -40,9 +35,8 @@ process BRAKER3 {
     cd braker_output
     
     echo "Starting BRAKER3 analysis..." > braker.log
-    echo "Input genome: ${masked_genome}" >> braker.log
-    echo "Proteins: ${proteins.name != 'NO_FILE' ? proteins : 'Not provided'}" >> braker.log
-    echo "RNA-seq: ${rna_seq.name != 'NO_FILE' ? rna_seq : 'Not provided'}" >> braker.log
+    echo "Input genome: ${masked_genome}" >> braker.log    echo "Proteins: ${proteins != 'NO_FILE' ? proteins : 'Not provided'}" >> braker.log
+    echo "RNA-seq: ${rna_seq != 'NO_FILE' ? rna_seq : 'Not provided'}" >> braker.log
     echo "Species: ${species_name}" >> braker.log
     echo "CPUs: ${task.cpus}" >> braker.log
     echo "Start time: \$(date)" >> braker.log

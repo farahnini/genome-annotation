@@ -9,9 +9,9 @@
 
 ## 🚀 Quick Start
 
-**Choose your platform:**
+**Choose your deployment:**
 
-### 🐧 Linux/WSL2 Users (Recommended)
+### 🐧 Local Linux/WSL2 Setup
 
 ```bash
 # 1. Get the pipeline
@@ -30,6 +30,30 @@ source activate_environment.sh
 nextflow run main.nf --genome your_genome.fasta --species "your_species" -profile singularity
 ```
 
+### 🖥️ HPC Deployment (Recommended for large genomes)
+
+```bash
+# 1. Prepare package locally
+git clone https://github.com/farahnini/genome-annotation.git
+cd genome-annotation
+./setup_simple.sh
+./create_hpc_package.sh
+
+# 2. Transfer to HPC
+scp genome-annotation-hpc-*.tar.gz username@hpc:/path/to/destination/
+
+# 3. Setup on HPC
+ssh username@hpc
+tar -xzf genome-annotation-hpc-*.tar.gz
+cd genome-annotation
+source activate_environment.sh
+
+# 4. Run pipeline on HPC
+nextflow run main.nf --genome genome.fasta --species "species" -profile singularity
+```
+
+📖 **For detailed HPC setup, see [`HPC_DEPLOYMENT.md`](HPC_DEPLOYMENT.md)**
+
 ### 🪟 Windows Users
 
 ```powershell
@@ -40,13 +64,9 @@ cd genome-annotation
 # 2. Setup (PowerShell)
 .\setup_test.ps1
 
-# 3. Run pipeline (in WSL2)
-wsl
-source activate_environment.sh
-./test/run_test.sh
+# 3. Transfer to HPC for actual execution
+# (Windows is for setup only - pipeline runs on Linux/HPC)
 ```
-
-**⚠️ Windows Note**: The pipeline runs in Linux containers. Windows users need WSL2 for the actual pipeline execution.
 
 ## 🧪 Testing & Validation
 
@@ -193,35 +213,31 @@ source activate_environment.sh # Fix Java compatibility
 
 **For comprehensive troubleshooting, see [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md)**
 
-## 🗂️ Available Scripts (Why so many?)
+## 🗂️ Available Scripts
 
-The pipeline includes multiple setup scripts for different use cases:
-
-### 🎯 **Main Scripts** (Use these)
-- **`setup_simple.sh`** ⭐ - **Recommended**: Works with any Java version, fixes compatibility automatically
-- **`test/run_test.sh`** - Tests the pipeline with small data (~5 min)
+### 🎯 **Main Scripts** (Essential)
+- **`setup_simple.sh`** ⭐ - Sets up environment with Java compatibility
+- **`activate_environment.sh`** - Activates environment (created by setup)
+- **`create_hpc_package.sh`** - Creates deployment package for HPC
+- **`test/run_test.sh`** - Tests pipeline with small data
 - **`check_installation.sh`** - Diagnoses installation issues
 
-### 🔧 **Alternative Setup Methods**
-- **`setup_complete_environment.sh`** - Creates isolated environment (for complex setups)
-- **`setup_environment.sh`** - Basic environment setup
-- **`manage_container.sh`** - Container-based approach (advanced users)
+### 🖥️ **HPC-Specific**
+- **[`HPC_DEPLOYMENT.md`](HPC_DEPLOYMENT.md)** - Complete HPC setup guide
+- **`hpc.config`** - HPC cluster configuration (create as needed)
 
-### 🪟 **Windows-Specific**
-- **`setup_test.ps1`** - PowerShell setup for Windows users
-- **`run_pipeline.ps1`** - PowerShell wrapper for Windows
+### 🪟 **Windows Support**
+- **`setup_test.ps1`** - PowerShell setup for test data
+- **`run_pipeline.ps1`** - PowerShell wrapper (calls Linux execution)
 
-### 🛠️ **Utility Scripts**
-- **`fix_environment.sh`** - Cleans up failed installations
-- **`quick_start.sh`** - Shows all available options
-- **`create_test_data.sh`** - Alternative test data creation
+### 🧹 **Cleanup**
+Removed unused scripts:
+- ~~`setup_complete_environment.sh`~~ (redundant)
+- ~~`setup_environment.sh`~~ (redundant)  
+- ~~`fix_environment.sh`~~ (redundant)
+- ~~`quick_start.sh`~~ (redundant)
 
-**Why so many?** Different users have different needs:
-- **Beginners**: Use `setup_simple.sh` 
-- **Java issues**: Use `setup_complete_environment.sh`
-- **Windows users**: Use PowerShell scripts + WSL2
-- **Advanced users**: Use container approach
-- **Troubleshooting**: Multiple diagnostic and fix scripts
+**Streamlined approach**: Use `setup_simple.sh` for all setups, deploy to HPC for production runs.
 
 ## 📁 Output Files
 

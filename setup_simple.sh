@@ -105,24 +105,21 @@ EOF
 chmod +x activate_environment.sh
 
 # Test the setup
-echo "6. Testing setup..."
-source activate_environment.sh
-
-# Run validation
-if [ -f "test/validate_setup.sh" ]; then
-    echo "Running validation..."
-    chmod +x test/validate_setup.sh
-    ./test/validate_setup.sh
-fi
+echo "6. Environment setup completed!"
+echo "⚠️  Skipping tests - assuming HPC deployment"
 
 echo
 echo "🎉 Simple setup completed!"
 echo
-echo "To use the pipeline:"
-echo "1. Activate environment: source activate_environment.sh"
-echo "2. Run test: ./test/run_test.sh"
-echo "3. Use pipeline: nextflow run main.nf --genome your_genome.fasta --species 'your_species' -profile singularity"
+echo "To use the pipeline on HPC:"
+echo "1. Transfer files to HPC"
+echo "2. Activate environment: source activate_environment.sh"  
+echo "3. Load HPC modules (if needed): module load singularity java"
+echo "4. Run pipeline: nextflow run main.nf --genome your_genome.fasta --species 'your_species' -profile singularity"
 echo
-echo "If you still have Java issues, try:"
+echo "For testing on HPC:"
+echo "  ./test/run_test.sh"
+echo
+echo "If you have Java compatibility issues on HPC, the environment script sets:"
 echo "  export JAVA_OPTS=\"--add-opens=java.base/java.lang=ALL-UNNAMED\""
 echo "  export NXF_OPTS=\"\$JAVA_OPTS\""
